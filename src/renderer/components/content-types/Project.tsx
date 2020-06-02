@@ -25,6 +25,17 @@ interface ProjectDoc {
 
 Project.defaultWidth = 15
 
+interface TaskProps {
+  task: Task
+}
+
+function Task(props: TaskProps) {
+  return <div className="Task">
+    <h2 className="TaskTitle">{props.task.title}</h2>
+    <div className="TaskDescription">{props.task.description}</div>
+  </div>
+}
+
 export default function Project(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ProjectDoc>(props.hypermergeUrl)
 
@@ -39,22 +50,25 @@ export default function Project(props: ContentProps) {
   //
   // todo: heading seems redundant with the title bar, pick one
   return (
-    <div
-      className="Project"
-    >
-      <Heading style={{fontWeight: "bold", fontSize: "20px"}}>{doc.title}</Heading>
+    <div className="ProjectContainer">
+      <div className="Project">
 
-      <div className="taskList">
-        { doc.tasks && doc.tasks.map(task => <div className="Task">{task.title}</div>) }
-       </div>
+        <h1 className="ProjectTitle">{doc.title}</h1>
 
-      <hr />
+        { doc.tasks && doc.tasks.map(task => <Task task={task} />) }
 
-      <span>Debug doc contents:</span>
+        <button className="AddTaskButton" onClick={ () => console.log("hi") }>
+          Add new task
+        </button>
 
-      <pre style={{fontSize: "12px", width: "300px"}}>
-        { JSON.stringify(doc) }
-      </pre>
+        <div className="debug">
+          <div>doc contents:</div>
+
+          <div style={{fontSize: "12px", width: "300px"}}>
+            { JSON.stringify(doc) }
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
