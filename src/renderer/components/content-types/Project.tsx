@@ -29,8 +29,9 @@ interface ProjectDoc {
 Project.defaultWidth = 15
 
 interface TaskProps {
-  task: Task,
+  task: Task
   toggleComplete(string): void
+  updateTitle(string): void
 }
 
 function Task(props: TaskProps) {
@@ -40,10 +41,16 @@ function Task(props: TaskProps) {
       type="checkbox"
       checked={props.task.complete}
       onChange={() => props.toggleComplete(props.task.id)} />
-    <h2 className={`TaskTitle ${props.task.complete ? 'complete' : ''}`}>
-      {props.task.title}
-    </h2>
-    <div className="TaskDescription">{props.task.description}</div>
+    <input
+      value={props.task.title}
+      className={`TaskTitle ${props.task.complete ? 'complete' : ''}`}
+      onChange={(e) => props.updateTitle(props.task.id, e.target.value)} />
+
+    <input
+      value={props.task.description}
+      className="TaskDescription"
+      onChange={(e) => props.updateDescription(props.task.id, e.target.value)}
+      />
   </div>
 }
 
@@ -64,7 +71,27 @@ export default function Project(props: ContentProps) {
   let toggleComplete = (taskId) => {
     changeDoc((projectDoc: ProjectDoc) => {
       let task = projectDoc.tasks.find(t => t.id === taskId)
-      task.complete = !task.complete
+      if (task) {
+        task.complete = !task.complete
+      }
+    })
+  }
+
+  let updateTitle = (taskId, newTitle) => {
+    changeDoc((projectDoc: ProjectDoc) => {
+      let task = projectDoc.tasks.find(t => t.id === taskId)
+      if (task) {
+        task.title = newTitle
+      }
+    })
+  }
+
+  let updateDescription = (taskId, newDescription) => {
+    changeDoc((projectDoc: ProjectDoc) => {
+      let task = projectDoc.tasks.find(t => t.id === taskId)
+      if (task) {
+        task.description = newDescription
+      }
     })
   }
 
@@ -88,6 +115,8 @@ export default function Project(props: ContentProps) {
           <Task
             task={task}
             toggleComplete={ toggleComplete }
+            updateTitle={ updateTitle }
+            updateDescription={ updateDescription }
             key={task.id}
           />)
 
