@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useMemo } from 'react'
 import { Handle } from 'hypermerge'
+import { v4 as uuidv4 } from 'uuid';
 
 import * as ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
@@ -14,8 +15,10 @@ import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 import Heading from '../ui/Heading'
 
 interface Task {
+  id: string
   title: string
   description: string
+  complete: boolean
 }
 
 interface ProjectDoc {
@@ -26,12 +29,20 @@ interface ProjectDoc {
 Project.defaultWidth = 15
 
 interface TaskProps {
-  task: Task
+  task: Task,
+  toggleComplete(string): void
 }
 
 function Task(props: TaskProps) {
   return <div className="Task">
-    <h2 className="TaskTitle">{props.task.title}</h2>
+    <input
+      name="complete"
+      type="checkbox"
+      checked={props.task.complete}
+      onChange={() => props.toggleComplete(props.task.id)} />
+    <h2 className={`TaskTitle ${props.task.complete ? 'complete' : ''}`}>
+      {props.task.title}
+    </h2>
     <div className="TaskDescription">{props.task.description}</div>
   </div>
 }
@@ -42,9 +53,18 @@ export default function Project(props: ContentProps) {
   let addTask = () => {
     changeDoc((projectDoc: ProjectDoc) => {
       projectDoc.tasks.push({
+        id: uuidv4(),
         title: "New task",
-        description: "No description"
+        description: "No description",
+        complete: false
       })
+    })
+  }
+
+  let toggleComplete = (taskId) => {
+    changeDoc((projectDoc: ProjectDoc) => {
+      let task = projectDoc.tasks.find(t => t.id === taskId)
+      task.complete = !task.complete
     })
   }
 
@@ -64,7 +84,14 @@ export default function Project(props: ContentProps) {
 
         <h1 className="ProjectTitle">{doc.title}</h1>
 
-        { doc.tasks && doc.tasks.map(task => <Task task={task} />) }
+        { doc.tasks && doc.tasks.map(task =>
+          <Task
+            task={task}
+            toggleComplete={ toggleComplete }
+            key={task.id}
+          />)
+
+         }
 
         <button className="AddTaskButton" onClick={ addTask }>
           Add new task
@@ -109,12 +136,7 @@ function ProjectInList(props: ContentProps) {
 function create(unusedAttrs, handle) {
   handle.change((doc) => {
     doc.title = "Yet Another Project"
-    doc.tasks = [
-      {
-        title: "Fork pushpin",
-        description: "Start an issue tracker"
-      }
-    ]
+    doc.tasks = []
   })
 }
 
