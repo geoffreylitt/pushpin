@@ -27,7 +27,7 @@
   margin-bottom: 5px;
 }
 
-.TaskTitle.complete {
+.complete {
   text-decoration: line-through;
   color: #aaa;
 }

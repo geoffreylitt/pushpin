@@ -14,6 +14,8 @@ import ContentDragHandle from '../ui/ContentDragHandle'
 import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 import Heading from '../ui/Heading'
 
+import JSONPretty from 'react-json-pretty';
+
 interface Task {
   id: string
   title: string
@@ -32,6 +34,7 @@ interface TaskProps {
   task: Task
   toggleComplete(string): void
   updateTitle(string): void
+  updateDescription(string, string): void
 }
 
 function Task(props: TaskProps) {
@@ -48,7 +51,7 @@ function Task(props: TaskProps) {
 
     <input
       value={props.task.description}
-      className="TaskDescription"
+      className={`TaskDescription ${props.task.complete ? 'complete' : ''}`}
       onChange={(e) => props.updateDescription(props.task.id, e.target.value)}
       />
   </div>
@@ -129,9 +132,7 @@ export default function Project(props: ContentProps) {
         <div className="debug">
           <div>doc contents:</div>
 
-          <div style={{fontSize: "12px", width: "300px"}}>
-            { JSON.stringify(doc) }
-          </div>
+          <JSONPretty id="json-pretty" data={doc} />
         </div>
       </div>
     </div>
