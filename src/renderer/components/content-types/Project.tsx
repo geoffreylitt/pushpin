@@ -39,6 +39,15 @@ function Task(props: TaskProps) {
 export default function Project(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ProjectDoc>(props.hypermergeUrl)
 
+  let addTask = () => {
+    changeDoc((projectDoc: ProjectDoc) => {
+      projectDoc.tasks.push({
+        title: "New task",
+        description: "No description"
+      })
+    })
+  }
+
   // todo: why wouldn't there be a doc here?
   // Is it only temporarily while loading data?
   if (!doc) {
@@ -57,7 +66,7 @@ export default function Project(props: ContentProps) {
 
         { doc.tasks && doc.tasks.map(task => <Task task={task} />) }
 
-        <button className="AddTaskButton" onClick={ () => console.log("hi") }>
+        <button className="AddTaskButton" onClick={ addTask }>
           Add new task
         </button>
 
