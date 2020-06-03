@@ -58,6 +58,20 @@ On Windows, it is: `~\AppData\Roaming\PushPin`
 
 Per-NAME data is stored under that directory inside `pushpin-v11`. (The number may be higher if you're reading this in the future and we forgot to update the readme.) You can remove a single directory from to reset a user's data, or remove the entire data directory to reset all user data.
 
+## JSON Schema + types experiment
+
+To compile JSON schema to Typescript types:
+
+```console
+$ yarn global add json-schema-to-typescript
+$ json2ts src/types/projectSchema.json > src/types/project.d.ts
+````
+
+This uses [json-schema-to-typescript](https://github.com/bcherny/json-schema-to-typescript) to generate types for the `Project` schema.
+
+We can also do this in a JS script in the future if desired;
+this is just a terminal example for convenience.
+
 ## Using PushPin
 
 PushPin is an offline-first collaborative cork board. You can make new text notes by double-clicking, and drag-and-drop or paste in text, images, PDFs, audio files, video files, URLs, or even arbitrary other files to a board.

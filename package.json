@@ -46,6 +46,7 @@
     "immutable": "^3.8.2",
     "jimp": "^0.6.4",
     "js-crc": "^0.2.0",
+    "json-schema-to-typescript": "^9.1.0",
     "mime-types": "^2.1.24",
     "mkdirp": "0.5.1",
     "node-ipc": "^9.1.1",
