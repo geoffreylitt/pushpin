@@ -11,9 +11,9 @@ import ListItem from '../ui/ListItem'
 import ContentDragHandle from '../ui/ContentDragHandle'
 import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 
-import projectSchema from '../../../types/projectSchema.json'
+import projectSchema from '../../../schemas/ProjectV1.json'
 
-import { ProjectDoc, ProjectDocTask } from '../../../types/project'
+import { ProjectDoc, ProjectDocTask } from '../../../schemas/ProjectV1'
 
 Project.defaultWidth = 15
 

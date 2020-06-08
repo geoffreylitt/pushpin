@@ -14,6 +14,7 @@ export interface ProjectDoc {
    * A list of tasks in the project
    */
   tasks: ProjectDocTask[];
+  [k: string]: unknown;
 }
 /**
  * A distinct thing to do in a project
