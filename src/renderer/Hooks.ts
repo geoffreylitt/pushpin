@@ -71,10 +71,16 @@ export function useTypedDocument<D>(
 ): [Doc<D> | null, ChangeFn<D>] {
   const [doc, setDoc] = useDocument<D>(url)
 
-  // todo: convert (or try to)
-  if (doc.version === 'v1') {
-    doc.tasks = []
+  // We don't want to try to validate an unloaded doc against the schema.
+  // For now, just return the null doc
+  if (doc === null) {
+    return [doc, setDoc]
   }
+
+  // todo: convert (or try to)
+  // if (doc.version === 'v1') {
+  //   doc.tasks = []
+  // }
 
   // validate
   const ajv = new Ajv({ allErrors: true })
