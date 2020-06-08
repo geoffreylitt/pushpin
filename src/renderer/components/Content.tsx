@@ -13,17 +13,13 @@ import { parseDocumentLink, HypermergeUrl, PushpinUrl } from '../ShareLink'
 import Crashable from './Crashable'
 import { useHeartbeat } from '../PresenceHooks'
 import { useSelfId } from '../SelfHooks'
-import { useTypedDocument } from '../Hooks'
-import { ProjectDoc } from '../../types/project'
 
 // this is the interface imported by Content types
-export interface ContentProps<D> {
+export interface ContentProps {
   context: ContentTypes.Context
   url: PushpinUrl
   type: string
   hypermergeUrl: HypermergeUrl
-  doc?: any
-  changeDoc?: any
   selfId: HypermergeUrl
   contentRef?: Ref<ContentHandle>
 }
@@ -44,8 +40,6 @@ const Content: RefForwardingComponent<ContentHandle, Props> = (
   ref: Ref<ContentHandle>
 ) => {
   const { context, url } = props
-
-  const [doc, changeDoc] = useTypedDocument<ProjectDoc>(props.hypermergeUrl, projectSchema)
 
   const [isCrashed, setCrashed] = useState(false)
   const selfId = useSelfId()
@@ -81,8 +75,6 @@ const Content: RefForwardingComponent<ContentHandle, Props> = (
         key={url}
         type={type}
         hypermergeUrl={hypermergeUrl}
-        doc={doc}
-        changeDoc={changeDoc}
         selfId={selfId}
       />
     </Crashable>
