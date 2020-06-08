@@ -2,7 +2,7 @@ const schema = {
   $schema: 'http://json-schema.org/draft-07/schema',
   $id: 'hypermerge:/SomeUrlInHypermerge',
   type: 'object',
-  title: 'Project',
+  title: 'ProjectDoc',
   description: 'A project in Arthropod, comprising a list of tasks',
   default: {},
   required: ['title', 'tasks'],
@@ -20,7 +20,7 @@ const schema = {
       items: {
         $id: 'hypermerge:/SomeOtherUrlInHypermerge',
         type: 'object',
-        title: 'Task',
+        title: 'ProjectDocTask',
         description: 'A distinct thing to do in a project',
         default: {},
         required: ['id', 'title', 'description', 'complete'],

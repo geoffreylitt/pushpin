@@ -1,39 +1,24 @@
 import React, { useCallback } from 'react'
-import { Handle } from 'hypermerge'
 import { v4 as uuidv4 } from 'uuid'
 
+import JSONPretty from 'react-json-pretty'
 import * as ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
 import { useDocument, useTypedDocument } from '../../Hooks'
 import './Project.css'
 import Badge from '../ui/Badge'
-import * as ContentData from '../../ContentData'
-import * as WebStreamLogic from '../../../WebStreamLogic'
 import ListItem from '../ui/ListItem'
 import ContentDragHandle from '../ui/ContentDragHandle'
 import TitleWithSubtitle from '../ui/TitleWithSubtitle'
-import Heading from '../ui/Heading'
 
 import projectSchema from '../../../types/projectSchema'
 
-import JSONPretty from 'react-json-pretty'
-
-interface Task {
-  id: string
-  title: string
-  description: string
-  complete: boolean
-}
-
-interface ProjectDoc {
-  title: string
-  tasks: Task[]
-}
+import { ProjectDoc, ProjectDocTask } from '../../../types/project'
 
 Project.defaultWidth = 15
 
 interface TaskProps {
-  task: Task
+  task: ProjectDocTask
   toggleComplete(string): void
   updateTitle(taskId: string, newTitle: string): void
   updateDescription(taskId: string, newDescription: string): void
@@ -113,11 +98,11 @@ export default function Project(props: ContentProps) {
     [changeDoc]
   )
 
-  // todo: why wouldn't there be a doc here?
-  // Is it only temporarily while loading data?
+  // todo: find a way to not need this type guard?
+  // We need to run all Hooks (because of hooks implementation) so
+  // this has to come after all hooks
   if (!doc) {
-    console.log(doc)
-    return <>Loading project...</>
+    return null
   }
 
   // todo: the `doc.tasks &&` below is precisely an example of the
@@ -139,7 +124,7 @@ export default function Project(props: ContentProps) {
           />
         ))}
 
-        <button className="AddTaskButton" onClick={addTask}>
+        <button type="button" className="AddTaskButton" onClick={addTask}>
           Add new task
         </button>
 

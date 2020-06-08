@@ -8,17 +8,17 @@
 /**
  * A project in Arthropod, comprising a list of tasks
  */
-export interface Project {
+export interface ProjectDoc {
   title: string;
   /**
    * A list of tasks in the project
    */
-  tasks: Task[];
+  tasks: ProjectDocTask[];
 }
 /**
  * A distinct thing to do in a project
  */
-export interface Task {
+export interface ProjectDocTask {
   id: string;
   title: string;
   description: string;
