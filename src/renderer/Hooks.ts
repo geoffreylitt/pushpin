@@ -6,6 +6,9 @@ import Ajv from 'ajv'
 import * as Hyperfile from './hyperfile'
 import { HypermergeUrl } from './ShareLink'
 
+import ProjectV1 from '../schemas/ProjectV1.json'
+import ProjectV2 from '../schemas/ProjectV2.json'
+
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 
 type Cleanup = void | (() => void)
@@ -83,7 +86,9 @@ export function useTypedDocument<D>(
   // }
 
   // validate
-  const ajv = new Ajv({ allErrors: true })
+
+  // need to load all schemas into Ajv so that it can follow ref URLs
+  const ajv = new Ajv({ allErrors: true, schemas: [ProjectV1, ProjectV2] })
   const validate = ajv.compile(schema)
   const valid = validate(doc)
 

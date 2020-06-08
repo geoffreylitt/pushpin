@@ -8,20 +8,27 @@
 /**
  * A project in Arthropod, comprising a list of tasks
  */
+export type ProjectDocV2 = ProjectDocV1 & {
+  description: string
+}
+
+/**
+ * A project in Arthropod, comprising a list of tasks
+ */
 export interface ProjectDocV1 {
-  title: string;
+  title: string
   /**
    * A list of tasks in the project
    */
-  tasks: ProjectDocTask[];
-  authorIds?: string[];
+  tasks: ProjectDocTask[]
+  authorIds?: string[]
 }
 /**
  * A distinct thing to do in a project
  */
 export interface ProjectDocTask {
-  id: string;
-  title: string;
-  description: string;
-  complete: boolean;
+  id: string
+  title: string
+  description: string
+  complete: boolean
 }

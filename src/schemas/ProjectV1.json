@@ -1,15 +1,15 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "hypermerge:/SomeUrlInHypermerge",
+    "$id": "schemas://projectv1",
     "type": "object",
-    "title": "ProjectDoc",
+    "title": "ProjectDocV1",
     "description": "A project in Arthropod, comprising a list of tasks",
     "default": {},
     "required": [
         "title",
         "tasks"
     ],
-    "additionalProperties": true,
+    "additionalProperties": false,
     "properties": {
         "title": {
             "type": "string",
@@ -49,6 +49,12 @@
                         "default": false
                     }
                 }
+            }
+        },
+        "authorIds": {
+            "type": "array",
+            "items": {
+                "type": "string"
             }
         }
     }

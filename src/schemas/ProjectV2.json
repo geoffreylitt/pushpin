@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "schemas://projectv2",
+  "type": "object",
+  "title": "ProjectDocV2",
+  "description": "A project in Arthropod, comprising a list of tasks",
+  "default": {},
+  "allOf": [
+    {
+      "$ref": "schemas://projectv1"
+    },
+    {
+      "properties": {
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description"
+      ]
+    }
+  ]
+}

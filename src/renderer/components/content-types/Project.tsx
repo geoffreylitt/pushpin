@@ -11,9 +11,10 @@ import ListItem from '../ui/ListItem'
 import ContentDragHandle from '../ui/ContentDragHandle'
 import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 
+// We specify versions in the import path, but give non-versioned names in code.
+// To change versions in the future, we only need to change this one spot.
 import projectSchema from '../../../schemas/ProjectV1.json'
-
-import { ProjectDoc, ProjectDocTask } from '../../../schemas/ProjectV1'
+import { ProjectDocV1, ProjectDocTask } from '../../../schemas/ProjectV1'
 
 Project.defaultWidth = 15
 
@@ -49,10 +50,10 @@ function Task(props: TaskProps) {
 }
 
 export default function Project(props: ContentProps) {
-  const [doc, changeDoc] = useTypedDocument<ProjectDoc>(props.hypermergeUrl, projectSchema)
+  const [doc, changeDoc] = useTypedDocument<ProjectDocV1>(props.hypermergeUrl, projectSchema)
 
   const addTask = useCallback(() => {
-    changeDoc((projectDoc: ProjectDoc) => {
+    changeDoc((projectDoc: ProjectDocV1) => {
       projectDoc.tasks.push({
         id: uuidv4(),
         title: 'New task',
@@ -64,7 +65,7 @@ export default function Project(props: ContentProps) {
 
   const toggleComplete = useCallback(
     (taskId) => {
-      changeDoc((projectDoc: ProjectDoc) => {
+      changeDoc((projectDoc: ProjectDocV1) => {
         const task = projectDoc.tasks.find((t) => t.id === taskId)
         if (task) {
           task.complete = !task.complete
@@ -76,7 +77,7 @@ export default function Project(props: ContentProps) {
 
   const updateTitle = useCallback(
     (taskId, newTitle) => {
-      changeDoc((projectDoc: ProjectDoc) => {
+      changeDoc((projectDoc: ProjectDocV1) => {
         const task = projectDoc.tasks.find((t) => t.id === taskId)
         if (task) {
           task.title = newTitle
@@ -88,7 +89,7 @@ export default function Project(props: ContentProps) {
 
   const updateDescription = useCallback(
     (taskId, newDescription) => {
-      changeDoc((projectDoc: ProjectDoc) => {
+      changeDoc((projectDoc: ProjectDocV1) => {
         const task = projectDoc.tasks.find((t) => t.id === taskId)
         if (task) {
           task.description = newDescription
@@ -144,7 +145,7 @@ export default function Project(props: ContentProps) {
 // can take it from there
 function ProjectInList(props: ContentProps) {
   const { hypermergeUrl, url } = props
-  const [doc] = useDocument<ProjectDoc>(hypermergeUrl)
+  const [doc] = useDocument<ProjectDocV1>(hypermergeUrl)
   if (!doc) return null
 
   return (
