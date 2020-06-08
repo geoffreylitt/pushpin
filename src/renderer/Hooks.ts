@@ -2,8 +2,6 @@ import { useEffect, useState, useRef, useCallback, createContext, useContext } f
 import { Handle, RepoFrontend, HyperfileUrl, Doc, CryptoClient } from 'hypermerge'
 import { Header } from 'hypermerge/dist/FileStore'
 import { Readable } from 'stream'
-import { JSONSchema7 } from 'json-schema'
-import { validate } from 'jsonschema'
 import Ajv from 'ajv'
 import * as Hyperfile from './hyperfile'
 import { HypermergeUrl } from './ShareLink'
@@ -67,7 +65,9 @@ export type MaybeDoc<D> = Doc<D> | ConversionError
 // expose a well-typed doc or a conversion error
 export function useTypedDocument<D>(
   url: HypermergeUrl | null,
-  schema: JSONSchema7
+
+  // ajv's types don't let us statically typecheck the schema itself
+  schema: any
 ): [Doc<D> | null, ChangeFn<D>] {
   const [doc, setDoc] = useDocument<D>(url)
 

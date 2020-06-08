@@ -11,7 +11,7 @@ import ListItem from '../ui/ListItem'
 import ContentDragHandle from '../ui/ContentDragHandle'
 import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 
-import projectSchema from '../../../types/projectSchema'
+import projectSchema from '../../../types/projectSchema.json'
 
 import { ProjectDoc, ProjectDocTask } from '../../../types/project'
 

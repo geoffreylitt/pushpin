@@ -5,13 +5,20 @@
     "noImplicitAny": false,
     "sourceMap": true,
     "noFallthroughCasesInSwitch": true,
-    "lib": ["es2015", "es2017", "es2019", "dom", "webworker"],
+    "lib": [
+      "es2015",
+      "es2017",
+      "es2019",
+      "dom",
+      "webworker"
+    ],
     "target": "es2016",
     "module": "CommonJS",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
     "pretty": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "resolveJsonModule": true
   }
 }
