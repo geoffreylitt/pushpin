@@ -9,7 +9,7 @@
         "title",
         "tasks"
     ],
-    "additionalProperties": true,
+    "additionalProperties": false,
     "properties": {
         "title": {
             "type": "string",
@@ -19,7 +19,7 @@
             "type": "array",
             "description": "A list of tasks in the project",
             "default": [],
-            "additionalItems": true,
+            "additionalItems": false,
             "items": {
                 "$id": "hypermerge:/SomeOtherUrlInHypermerge",
                 "type": "object",
@@ -32,7 +32,7 @@
                     "description",
                     "complete"
                 ],
-                "additionalProperties": true,
+                "additionalProperties": false,
                 "properties": {
                     "id": {
                         "type": "string"

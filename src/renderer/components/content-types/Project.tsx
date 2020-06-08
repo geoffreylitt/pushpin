@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useMemo } from 'react'
+import React, { useCallback } from 'react'
 import { Handle } from 'hypermerge'
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'
 
 import * as ContentTypes from '../../ContentTypes'
 import { ContentProps } from '../Content'
-import { useDocument, useStaticCallback } from '../../Hooks'
+import { useDocument, useTypedDocument } from '../../Hooks'
 import './Project.css'
 import Badge from '../ui/Badge'
 import * as ContentData from '../../ContentData'
@@ -14,7 +14,9 @@ import ContentDragHandle from '../ui/ContentDragHandle'
 import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 import Heading from '../ui/Heading'
 
-import JSONPretty from 'react-json-pretty';
+import projectSchema from '../../../types/projectSchema'
+
+import JSONPretty from 'react-json-pretty'
 
 interface Task {
   id: string
@@ -33,74 +35,88 @@ Project.defaultWidth = 15
 interface TaskProps {
   task: Task
   toggleComplete(string): void
-  updateTitle(string): void
-  updateDescription(string, string): void
+  updateTitle(taskId: string, newTitle: string): void
+  updateDescription(taskId: string, newDescription: string): void
 }
 
 function Task(props: TaskProps) {
-  return <div className="Task">
-    <input
-      name="complete"
-      type="checkbox"
-      checked={props.task.complete}
-      onChange={() => props.toggleComplete(props.task.id)} />
-    <input
-      value={props.task.title}
-      className={`TaskTitle ${props.task.complete ? 'complete' : ''}`}
-      onChange={(e) => props.updateTitle(props.task.id, e.target.value)} />
-
-    <input
-      value={props.task.description}
-      className={`TaskDescription ${props.task.complete ? 'complete' : ''}`}
-      onChange={(e) => props.updateDescription(props.task.id, e.target.value)}
+  return (
+    <div className="Task">
+      <input
+        name="complete"
+        type="checkbox"
+        checked={props.task.complete}
+        onChange={() => props.toggleComplete(props.task.id)}
       />
-  </div>
+      <input
+        value={props.task.title}
+        className={`TaskTitle ${props.task.complete ? 'complete' : ''}`}
+        onChange={(e) => props.updateTitle(props.task.id, e.target.value)}
+      />
+
+      <input
+        value={props.task.description}
+        className={`TaskDescription ${props.task.complete ? 'complete' : ''}`}
+        onChange={(e) => props.updateDescription(props.task.id, e.target.value)}
+      />
+    </div>
+  )
 }
 
 export default function Project(props: ContentProps) {
-  const [doc, changeDoc] = useDocument<ProjectDoc>(props.hypermergeUrl)
+  const [doc, changeDoc] = useTypedDocument<ProjectDoc>(props.hypermergeUrl, projectSchema)
 
-  let addTask = () => {
+  const addTask = useCallback(() => {
     changeDoc((projectDoc: ProjectDoc) => {
       projectDoc.tasks.push({
         id: uuidv4(),
-        title: "New task",
-        description: "No description",
-        complete: false
+        title: 'New task',
+        description: 'No description',
+        complete: false,
       })
     })
-  }
+  }, [changeDoc])
 
-  let toggleComplete = (taskId) => {
-    changeDoc((projectDoc: ProjectDoc) => {
-      let task = projectDoc.tasks.find(t => t.id === taskId)
-      if (task) {
-        task.complete = !task.complete
-      }
-    })
-  }
+  const toggleComplete = useCallback(
+    (taskId) => {
+      changeDoc((projectDoc: ProjectDoc) => {
+        const task = projectDoc.tasks.find((t) => t.id === taskId)
+        if (task) {
+          task.complete = !task.complete
+        }
+      })
+    },
+    [changeDoc]
+  )
 
-  let updateTitle = (taskId, newTitle) => {
-    changeDoc((projectDoc: ProjectDoc) => {
-      let task = projectDoc.tasks.find(t => t.id === taskId)
-      if (task) {
-        task.title = newTitle
-      }
-    })
-  }
+  const updateTitle = useCallback(
+    (taskId, newTitle) => {
+      changeDoc((projectDoc: ProjectDoc) => {
+        const task = projectDoc.tasks.find((t) => t.id === taskId)
+        if (task) {
+          task.title = newTitle
+        }
+      })
+    },
+    [changeDoc]
+  )
 
-  let updateDescription = (taskId, newDescription) => {
-    changeDoc((projectDoc: ProjectDoc) => {
-      let task = projectDoc.tasks.find(t => t.id === taskId)
-      if (task) {
-        task.description = newDescription
-      }
-    })
-  }
+  const updateDescription = useCallback(
+    (taskId, newDescription) => {
+      changeDoc((projectDoc: ProjectDoc) => {
+        const task = projectDoc.tasks.find((t) => t.id === taskId)
+        if (task) {
+          task.description = newDescription
+        }
+      })
+    },
+    [changeDoc]
+  )
 
   // todo: why wouldn't there be a doc here?
   // Is it only temporarily while loading data?
   if (!doc) {
+    console.log(doc)
     return <>Loading project...</>
   }
 
@@ -111,26 +127,24 @@ export default function Project(props: ContentProps) {
   return (
     <div className="ProjectContainer">
       <div className="Project">
-
         <h1 className="ProjectTitle">{doc.title}</h1>
 
-        { doc.tasks && doc.tasks.map(task =>
+        {doc.tasks.map((task) => (
           <Task
             task={task}
-            toggleComplete={ toggleComplete }
-            updateTitle={ updateTitle }
-            updateDescription={ updateDescription }
+            toggleComplete={toggleComplete}
+            updateTitle={updateTitle}
+            updateDescription={updateDescription}
             key={task.id}
-          />)
+          />
+        ))}
 
-         }
-
-        <button className="AddTaskButton" onClick={ addTask }>
+        <button className="AddTaskButton" onClick={addTask}>
           Add new task
         </button>
 
         <div className="debug">
-          <div>doc contents:</div>
+          <div>doc debug:</div>
 
           <JSONPretty id="json-pretty" data={doc} />
         </div>
@@ -153,19 +167,14 @@ function ProjectInList(props: ContentProps) {
       <ContentDragHandle url={url}>
         <Badge icon="sticky-note" />
       </ContentDragHandle>
-      <TitleWithSubtitle
-        title={doc.title}
-        subtitle={""}
-        hypermergeUrl={hypermergeUrl}
-        editable={true}
-      />
+      <TitleWithSubtitle title={doc.title} subtitle="" hypermergeUrl={hypermergeUrl} editable />
     </ListItem>
   )
 }
 
 function create(unusedAttrs, handle) {
   handle.change((doc) => {
-    doc.title = "Yet Another Project"
+    doc.title = 'Yet Another Project'
     doc.tasks = []
   })
 }

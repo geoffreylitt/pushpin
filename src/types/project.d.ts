@@ -14,7 +14,6 @@ export interface Project {
    * A list of tasks in the project
    */
   tasks: Task[];
-  [k: string]: unknown;
 }
 /**
  * A distinct thing to do in a project
@@ -24,5 +23,4 @@ export interface Task {
   title: string;
   description: string;
   complete: boolean;
-  [k: string]: unknown;
 }

@@ -2,6 +2,9 @@ import { useEffect, useState, useRef, useCallback, createContext, useContext } f
 import { Handle, RepoFrontend, HyperfileUrl, Doc, CryptoClient } from 'hypermerge'
 import { Header } from 'hypermerge/dist/FileStore'
 import { Readable } from 'stream'
+import { JSONSchema7 } from 'json-schema'
+import { validate } from 'jsonschema'
+import Ajv from 'ajv'
 import * as Hyperfile from './hyperfile'
 import { HypermergeUrl } from './ShareLink'
 
@@ -41,7 +44,7 @@ export function useHandle<D>(
 
   useEffect(() => {
     if (!url) {
-      return () => {}
+      return () => { }
     }
 
     const handle = repo.open<D>(url)
@@ -55,6 +58,32 @@ export function useHandle<D>(
   }, [url])
 
   return repo
+}
+
+type ConversionError = string
+
+export type MaybeDoc<D> = Doc<D> | ConversionError
+
+// expose a well-typed doc or a conversion error
+export function useTypedDocument<D>(
+  url: HypermergeUrl | null,
+  schema: JSONSchema7
+): [Doc<D> | null, ChangeFn<D>] {
+  const [doc, setDoc] = useDocument<D>(url)
+
+  // todo: convert (or try to)
+
+  // validate
+  const ajv = new Ajv({ allErrors: true })
+  const validate = ajv.compile(schema)
+  const valid = validate(doc)
+
+  if (!valid) {
+    console.error("doc doesn't match schema", validate.errors)
+    throw new Error("doc doesn't match schema")
+  }
+
+  return [doc, setDoc]
 }
 
 export function useDocument<D>(url: HypermergeUrl | null): [Doc<D> | null, ChangeFn<D>] {
@@ -103,7 +132,7 @@ export function useMessaging<M>(
   url: HypermergeUrl | null,
   onMsg: (msg: M) => void
 ): (msg: M) => void {
-  const [sendObj, setSend] = useState<{ send: (msg: M) => void }>({ send() {} })
+  const [sendObj, setSend] = useState<{ send: (msg: M) => void }>({ send() { } })
 
   // Without this ref, we'd close over the `onMsg` passed during the very first render.
   // Instead, we close over the ref object and can be sure we're always reading
@@ -116,8 +145,8 @@ export function useMessaging<M>(
     setSend({ send: handle.message })
 
     return () => {
-      onMsgRef.current = () => {}
-      setSend({ send() {} })
+      onMsgRef.current = () => { }
+      setSend({ send() { } })
     }
   })
   return sendObj.send
@@ -164,12 +193,12 @@ export function useInterval(ms: number, cb: () => void, deps: any[]) {
  * The timeout is cancelled when `cond` is set to false.
  */
 export function useTimeoutWhen(cond: boolean, ms: number, cb: () => void) {
-  const reset = useRef(() => {})
+  const reset = useRef(() => { })
 
   useEffect(() => {
     if (!cond) {
-      reset.current = () => {}
-      return () => {}
+      reset.current = () => { }
+      return () => { }
     }
 
     let id: NodeJS.Timeout
@@ -306,7 +335,7 @@ export function useEvent<K extends string>(
   cb: (this: EventTarget, ev: Event) => void
 ): void {
   useEffect(() => {
-    if (target == null) return () => {}
+    if (target == null) return () => { }
 
     target.addEventListener(type, cb)
 
