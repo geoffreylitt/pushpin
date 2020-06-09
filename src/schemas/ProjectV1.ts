@@ -8,13 +8,12 @@
 /**
  * A project in Arthropod, comprising a list of tasks
  */
-export interface ProjectDocV1 {
+export interface ProjectDoc {
   title: string;
   /**
    * A list of tasks in the project
    */
   tasks: ProjectDocTask[];
-  authorIds?: string[];
 }
 /**
  * A distinct thing to do in a project

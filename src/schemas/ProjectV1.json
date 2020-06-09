@@ -2,7 +2,7 @@
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "schemas://projectv1",
     "type": "object",
-    "title": "ProjectDocV1",
+    "title": "ProjectDoc",
     "description": "A project in Arthropod, comprising a list of tasks",
     "default": {},
     "required": [
@@ -49,12 +49,6 @@
                         "default": false
                     }
                 }
-            }
-        },
-        "authorIds": {
-            "type": "array",
-            "items": {
-                "type": "string"
             }
         }
     }

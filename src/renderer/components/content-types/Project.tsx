@@ -13,8 +13,8 @@ import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 
 // We specify versions in the import path, but give non-versioned names in code.
 // To change versions in the future, we only need to change this one spot.
-import projectSchema from '../../../schemas/ProjectV1.json'
-import { ProjectDocV1, ProjectDocTask } from '../../../schemas/ProjectV1'
+import projectSchema from '../../../schemas/ProjectV2.json'
+import { ProjectDoc, ProjectDocTask } from '../../../schemas/ProjectV2'
 
 Project.defaultWidth = 15
 
@@ -50,10 +50,11 @@ function Task(props: TaskProps) {
 }
 
 export default function Project(props: ContentProps) {
-  const [doc, changeDoc] = useTypedDocument<ProjectDocV1>(props.hypermergeUrl, projectSchema)
+  // return the soup doc to the UI just for debugging
+  const [doc, changeDoc, soupDoc] = useTypedDocument<ProjectDoc>(props.hypermergeUrl, projectSchema)
 
   const addTask = useCallback(() => {
-    changeDoc((projectDoc: ProjectDocV1) => {
+    changeDoc((projectDoc: ProjectDoc) => {
       projectDoc.tasks.push({
         id: uuidv4(),
         title: 'New task',
@@ -65,7 +66,7 @@ export default function Project(props: ContentProps) {
 
   const toggleComplete = useCallback(
     (taskId) => {
-      changeDoc((projectDoc: ProjectDocV1) => {
+      changeDoc((projectDoc: ProjectDoc) => {
         const task = projectDoc.tasks.find((t) => t.id === taskId)
         if (task) {
           task.complete = !task.complete
@@ -77,7 +78,7 @@ export default function Project(props: ContentProps) {
 
   const updateTitle = useCallback(
     (taskId, newTitle) => {
-      changeDoc((projectDoc: ProjectDocV1) => {
+      changeDoc((projectDoc: ProjectDoc) => {
         const task = projectDoc.tasks.find((t) => t.id === taskId)
         if (task) {
           task.title = newTitle
@@ -89,7 +90,7 @@ export default function Project(props: ContentProps) {
 
   const updateDescription = useCallback(
     (taskId, newDescription) => {
-      changeDoc((projectDoc: ProjectDocV1) => {
+      changeDoc((projectDoc: ProjectDoc) => {
         const task = projectDoc.tasks.find((t) => t.id === taskId)
         if (task) {
           task.description = newDescription
@@ -114,6 +115,7 @@ export default function Project(props: ContentProps) {
     <div className="ProjectContainer">
       <div className="Project">
         <h1 className="ProjectTitle">{doc.title}</h1>
+        <h3>{doc.description}</h3>
 
         {doc.tasks.map((task) => (
           <Task
@@ -130,9 +132,10 @@ export default function Project(props: ContentProps) {
         </button>
 
         <div className="debug">
-          <div>doc debug:</div>
-
+          <strong>Typed doc</strong>
           <JSONPretty id="json-pretty" data={doc} />
+          <strong>Soup doc</strong>
+          <JSONPretty id="json-pretty" data={soupDoc} />
         </div>
       </div>
     </div>
@@ -145,7 +148,7 @@ export default function Project(props: ContentProps) {
 // can take it from there
 function ProjectInList(props: ContentProps) {
   const { hypermergeUrl, url } = props
-  const [doc] = useDocument<ProjectDocV1>(hypermergeUrl)
+  const [doc] = useDocument<ProjectDoc>(hypermergeUrl)
   if (!doc) return null
 
   return (
@@ -160,8 +163,14 @@ function ProjectInList(props: ContentProps) {
 
 function create(unusedAttrs, handle) {
   handle.change((doc) => {
-    doc.title = 'Yet Another Project'
-    doc.tasks = []
+    doc['schemas://projectv1'] = {
+      title: 'A v2 project',
+      tasks: [],
+    }
+
+    doc['schemas://projectv2'] = {
+      description: 'A nice project',
+    }
   })
 }
 

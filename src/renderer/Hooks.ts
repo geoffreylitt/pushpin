@@ -3,6 +3,7 @@ import { Handle, RepoFrontend, HyperfileUrl, Doc, CryptoClient } from 'hypermerg
 import { Header } from 'hypermerge/dist/FileStore'
 import { Readable } from 'stream'
 import Ajv from 'ajv'
+import { change } from 'automerge'
 import * as Hyperfile from './hyperfile'
 import { HypermergeUrl } from './ShareLink'
 
@@ -65,29 +66,56 @@ type ConversionError = string
 
 export type MaybeDoc<D> = Doc<D> | ConversionError
 
+// A hardcoded conversion from the soup doc to a desired schema
+// (to be replaced with a real implementation)
+function readAs(soupDoc, schema) {
+  if (schema.$id === 'schemas://projectv1') {
+    return soupDoc['schemas://projectv1']
+  }
+  if (schema.$id === 'schemas://projectv2') {
+    return Object.assign(
+      soupDoc['schemas://projectv1'] || {},
+      soupDoc['schemas://projectv2'] || {
+        description: '',
+      }
+    )
+  }
+  return {}
+}
+
+function writeAs(changeSoupDoc, schema) {
+  return (cb) => {
+    console.log('changedoc')
+    changeSoupDoc((soupDoc) => {
+      cb(soupDoc['schemas://projectv1'])
+    })
+  }
+}
+
 // expose a well-typed doc or a conversion error
 export function useTypedDocument<D>(
   url: HypermergeUrl | null,
 
   // ajv's types don't let us statically typecheck the schema itself
   schema: any
-): [Doc<D> | null, ChangeFn<D>] {
-  const [doc, setDoc] = useDocument<D>(url)
+): [Doc<D> | null, ChangeFn<D>, Doc<D> | null] {
+  const [soupDoc, changeSoupDoc] = useDocument<D>(url)
 
   // We don't want to try to validate an unloaded doc against the schema.
   // For now, just return the null doc
-  if (doc === null) {
-    return [doc, setDoc]
+  if (soupDoc === null) {
+    return [soupDoc, changeSoupDoc, soupDoc]
   }
 
-  // todo: convert (or try to)
-  // if (doc.version === 'v1') {
-  //   doc.tasks = []
-  // }
+  // Convert the CRDT "soup doc" into a well typed doc
+  const doc = readAs(soupDoc, schema)
+  const changeDoc = writeAs(changeSoupDoc, schema)
 
-  // validate
+  // Validate the converted doc against JSON Schema
 
-  // need to load all schemas into Ajv so that it can follow ref URLs
+  // need to load all schemas into Ajv so that it can follow ref URLs.
+  // (the ref URLs aren't real, they're just identifiers)
+  // (in the future these could just be real hypermerge URLs)
   const ajv = new Ajv({ allErrors: true, schemas: [ProjectV1, ProjectV2] })
   const validate = ajv.compile(schema)
   const valid = validate(doc)
@@ -97,7 +125,7 @@ export function useTypedDocument<D>(
     throw new Error("doc doesn't match schema")
   }
 
-  return [doc, setDoc]
+  return [doc, changeDoc, soupDoc]
 }
 
 export function useDocument<D>(url: HypermergeUrl | null): [Doc<D> | null, ChangeFn<D>] {
