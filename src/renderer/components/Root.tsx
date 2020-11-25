@@ -26,6 +26,7 @@ import './content-types/files/ImageContent'
 import './content-types/files/AudioContent'
 import './content-types/files/VideoContent'
 import './content-types/files/PdfContent'
+import './content-types/RichTextContent'
 import System, { SystemContext } from '../System'
 
 interface Props {
