@@ -1,5 +1,5 @@
 // Import React dependencies.
-import React, { useEffect, useMemo, useState, useCallback } from 'react'
+import React, { useMemo, useState, useCallback } from 'react'
 // Import the Slate editor factory.
 import { createEditor, Transforms, Text } from 'slate'
 
@@ -7,39 +7,42 @@ import { createEditor, Transforms, Text } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 
 import * as ContentTypes from '../../ContentTypes'
-import Content, { ContentProps } from '../Content'
+import { ContentProps } from '../Content'
 import { useDocument } from '../../Hooks'
 import ListItem from '../ui/ListItem'
 import Badge from '../ui/Badge'
 import ContentDragHandle from '../ui/ContentDragHandle'
 import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 
+const deepCopy = (doc) => JSON.parse(JSON.stringify(doc))
+
+interface Doc {
+  title?: string
+  slateTree: any // todo: slate contents
+}
+
 // Define a React component to render leaves with bold text.
-const Leaf = props => {
+const Leaf = (props) => {
   return (
-    <span
-      {...props.attributes}
-      style={{ fontWeight: props.leaf.bold ? 'bold' : 'normal' }}
-    >
+    <span {...props.attributes} style={{ fontWeight: props.leaf.bold ? 'bold' : 'normal' }}>
       {props.children}
     </span>
   )
 }
 
 export default function RichText(props: ContentProps) {
+  const editor = useMemo(() => withReact(createEditor()), [])
   const [doc, changeDoc] = useDocument<Doc>(props.hypermergeUrl)
 
-  const editor = useMemo(() => withReact(createEditor()), [])
-  // Add the initial value when setting up our state.
-  const [value, setValue] = useState([
+  const defaultText = [
     {
       type: 'paragraph',
       children: [{ text: 'A line of text in a paragraph.' }],
     },
-  ])
+  ]
+  const tree = (doc && deepCopy(doc.slateTree)) || defaultText
 
-  // Define a leaf rendering function that is memoized with `useCallback`.
-  const renderLeaf = useCallback(props => {
+  const renderLeaf = useCallback((props) => {
     return <Leaf {...props} />
   }, [])
 
@@ -50,36 +53,35 @@ export default function RichText(props: ContentProps) {
   return (
     <Slate
       editor={editor}
-      value={value}
-      onChange={newValue => setValue(newValue)}
+      value={tree}
+      onChange={(newValue) =>
+        changeDoc((doc) => {
+          doc.slateTree = newValue
+        })
+      }
     >
       <Editable
-        renderLeaf={renderLeaf} 
-        onKeyDown={event => {
+        renderLeaf={renderLeaf}
+        onKeyDown={(event) => {
           if (!event.ctrlKey) {
             return
           }
 
           switch (event.key) {
             case 'b': {
-              console.log("b!")
               event.preventDefault()
               Transforms.setNodes(
                 editor,
                 { bold: true },
-                { match: n => Text.isText(n), split: true }
+                { match: (n) => Text.isText(n), split: true }
               )
               break
             }
           }
-        }}/>
+        }}
+      />
     </Slate>
   )
-}
-
-interface Doc {
-  title?: string
-  text: any // todo: slate contents
 }
 
 const icon = 'comments'
@@ -99,7 +101,7 @@ export function RichTextInList(props: ContentProps) {
       <TitleWithSubtitle
         titleEditorField="title"
         title={title}
-        subtitle={""}
+        subtitle=""
         hypermergeUrl={hypermergeUrl}
         editable
       />
@@ -109,7 +111,7 @@ export function RichTextInList(props: ContentProps) {
 
 function create(unusedAttrs, handle) {
   handle.change((doc) => {
-    doc.title = "Rich Text"
+    doc.title = 'Rich Text'
   })
 }
 
