@@ -5,6 +5,8 @@ import * as Hyperfile from '../renderer/hyperfile'
 import { FromSystemMsg } from '../renderer/System'
 import * as ClipperHost from '../ClipperHost'
 
+const port = (process.env.PORT && parseInt(process.env.PORT)) || 8080
+
 const log = Debug('pushpin:electron')
 
 ClipperHost.install()
@@ -60,7 +62,7 @@ async function createWindow() {
 
   if (isDevelopment) {
     mainWindow.webContents.openDevTools()
-    mainWindow.loadURL(`http://localhost:8080`)
+    mainWindow.loadURL(`http://localhost:${port}`)
   } else {
     mainWindow.loadFile('dist/index.html')
   }
@@ -87,7 +89,7 @@ async function createWindow() {
     // we only allow pushpin links to navigate
     // to avoid ever being in a position where we're loading rando files
     // or URLs within the app and getting stranded there
-    if (isDevelopment && url.startsWith(`http://localhost:8080`)) {
+    if (isDevelopment && url.startsWith(`http://localhost:${port}`)) {
       return
     }
 
@@ -153,7 +155,7 @@ function createBackgroundWindow() {
   const isDevelopment = process.env.NODE_ENV !== 'production'
 
   if (isDevelopment) {
-    backgroundWindow.loadURL(`http://localhost:8080/background.html`)
+    backgroundWindow.loadURL(`http://localhost:${port}/background.html`)
   } else {
     backgroundWindow.loadFile('dist/background.html')
   }
